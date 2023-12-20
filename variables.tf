@@ -19,3 +19,4 @@ variable "nsx_project_name" {}
 variable "project_group_name" {}
 variable "vcd_org_admin" {}
 variable "vcd_org_security_admin" {}
+variable "vcd_catalog" {}

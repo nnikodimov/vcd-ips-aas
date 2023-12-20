@@ -11,6 +11,7 @@
   vcd_org_vdc2 = "ovdc-02"
   vcd_org_admin = "sally"
   vcd_org_security_admin = "bob"
+  vcd_catalog = "workload"
 
 # VMware NSX Variables
 

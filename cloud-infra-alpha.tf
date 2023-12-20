@@ -81,8 +81,21 @@ resource "vcd_nsxt_edgegateway" "t1" {
   external_network_id = data.vcd_external_network_v2.provider_gateway.id
 }
 
+resource "vcd_nsxt_firewall" "edge_policy1" {
+  org           = "ALPHA"
+
+  edge_gateway_id = vcd_nsxt_edgegateway.t1.id
+
+  rule {
+    action      = "ALLOW"
+    name        = "allow all IPv4 traffic"
+    direction   = "IN_OUT"
+    ip_protocol = "IPV4"
+  }
+}
+
 resource "vcd_network_routed_v2" "using-public-prefix" {
-  name            = "ip-space-backed-routed-network"
+  name            = "dmz-network"
   edge_gateway_id = vcd_nsxt_edgegateway.t1.id
   gateway         = cidrhost(vcd_ip_space_ip_allocation.public-ip-prefix.ip_address, 1)
   prefix_length   = split("/", vcd_ip_space_ip_allocation.public-ip-prefix.ip_address)[1]
@@ -90,6 +103,19 @@ resource "vcd_network_routed_v2" "using-public-prefix" {
   static_ip_pool {
     start_address = cidrhost(vcd_ip_space_ip_allocation.public-ip-prefix.ip_address, 2)
     end_address   = cidrhost(vcd_ip_space_ip_allocation.public-ip-prefix.ip_address, 62)
+  }
+}
+
+resource "vcd_network_routed_v2" "using-private-prefix" {
+  name            = "prod-network"
+  edge_gateway_id = vcd_nsxt_edgegateway.t1.id
+  gateway            = "172.16.10.1"
+  prefix_length      = 24
+  guest_vlan_allowed = true
+
+  static_ip_pool {
+    start_address = "172.16.10.11"
+    end_address   = "172.16.10.100"
   }
 }
 
